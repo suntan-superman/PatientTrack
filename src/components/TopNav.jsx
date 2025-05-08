@@ -13,8 +13,9 @@ import {
   Button,
   IconButton
 } from '@mui/material';
+import LogoutDialog from './LogoutDialog';
 
-const TopNav = () => {
+const TopNav = ({ onLogout }) => {
   const [openModal, setOpenModal] = useState(null);
 
   const handleOpenModal = (modalType) => {
@@ -23,6 +24,11 @@ const TopNav = () => {
 
   const handleCloseModal = () => {
     setOpenModal(null);
+  };
+
+  const handleLogout = () => {
+    handleCloseModal();
+    onLogout();
   };
 
   const renderModalContent = () => {
@@ -51,15 +57,6 @@ const TopNav = () => {
             <DialogTitle>User Profile</DialogTitle>
             <DialogContent>
               <p>User profile information will be displayed here.</p>
-            </DialogContent>
-          </>
-        );
-      case 'logout':
-        return (
-          <>
-            <DialogTitle>Logout</DialogTitle>
-            <DialogContent>
-              <p>Are you sure you want to logout?</p>
             </DialogContent>
           </>
         );
@@ -119,29 +116,24 @@ const TopNav = () => {
       </div>
 
       <Dialog 
-        open={openModal !== null} 
+        open={openModal !== null && openModal !== 'logout'} 
         onClose={handleCloseModal}
         maxWidth="sm"
         fullWidth
       >
         {renderModalContent()}
         <DialogActions>
-          {openModal === 'logout' ? (
-            <>
-              <Button onClick={handleCloseModal} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={handleCloseModal} color="error">
-                Logout
-              </Button>
-            </>
-          ) : (
-            <Button onClick={handleCloseModal} color="primary">
-              Close
-            </Button>
-          )}
+          <Button onClick={handleCloseModal} color="primary">
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
+
+      <LogoutDialog 
+        open={openModal === 'logout'}
+        onClose={handleCloseModal}
+        onLogout={handleLogout}
+      />
     </>
   );
 };

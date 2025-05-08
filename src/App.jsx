@@ -29,11 +29,14 @@ function App() {
     console.log('Login attempt:', credentials);
     setIsAuthenticated(true);
     setUserRole(credentials.role);
+    // Set initial selected item after login
+    setSelectedItem({ path: '/dashboard/personal-info', title: 'Personal Info' });
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserRole(null);
+    setSelectedItem(null);
   };
 
   const handleMenuItemSelect = (item) => {
@@ -146,7 +149,7 @@ function App() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar onMenuItemSelect={handleMenuItemSelect} userRole={userRole} onLogout={handleLogout} />
       <div className="flex-1 ml-64">
-        <TopNav />
+        <TopNav onLogout={handleLogout} />
         <main className="pt-16 p-8">
           {renderContent()}
         </main>
