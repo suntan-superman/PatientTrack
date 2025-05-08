@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   HomeIcon, 
   CalendarIcon, 
@@ -8,7 +8,8 @@ import {
   VideoCameraIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  ChevronLeftIcon
+  ChevronLeftIcon,
+  ArrowsUpDownIcon
 } from '@heroicons/react/24/outline';
 
 const menuItems = [
@@ -80,22 +81,54 @@ const menuItems = [
 const Sidebar = ({ onMenuItemSelect }) => {
   const [expandedItems, setExpandedItems] = useState([]);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isAllExpanded, setIsAllExpanded] = useState(false);
+  const sidebarRef = useRef(null);
+  const selectedItemRef = useRef(null);
 
   const toggleSubmenu = (itemId) => {
-    setExpandedItems((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
-    );
+    setExpandedItems((prev) => {
+      if (prev.includes(itemId)) {
+        return prev.filter((id) => id !== itemId);
+      } else {
+        // Collapse other items when expanding a new one
+        return [itemId];
+      }
+    });
   };
 
   const toggleSidebar = () => {
     setIsSidebarExpanded(!isSidebarExpanded);
   };
 
+  const toggleAllItems = () => {
+    if (isAllExpanded) {
+      setExpandedItems([]);
+    } else {
+      setExpandedItems(menuItems.map(item => item.id));
+    }
+    setIsAllExpanded(!isAllExpanded);
+  };
+
   const handleMenuItemClick = (item) => {
     onMenuItemSelect(item);
+    // Find the parent menu item
+    const parentItem = menuItems.find(menuItem => 
+      menuItem.submenu?.some(subItem => subItem.id === item.id)
+    );
+    if (parentItem) {
+      setExpandedItems([parentItem.id]);
+    }
   };
+
+  // Auto-scroll to selected item
+  useEffect(() => {
+    if (selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }
+  }, [expandedItems]);
 
   return (
     <div
@@ -107,20 +140,35 @@ const Sidebar = ({ onMenuItemSelect }) => {
         {isSidebarExpanded && (
           <h1 className="text-white text-3xl font-bold mb-4">PatientTrack</h1>
         )}
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          className="w-full flex items-center justify-center p-2 rounded-lg hover:bg-gray-800 text-white bg-transparent border-none focus:outline-none"
-        >
-          {isSidebarExpanded ? (
-            <ChevronLeftIcon className="h-6 w-6" />
-          ) : (
-            <ChevronRightIcon className="h-6 w-6" />
+        <div className="flex space-x-2">
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="flex-1 flex items-center justify-center p-2 rounded-lg hover:bg-gray-800 text-white bg-transparent border-none focus:outline-none"
+          >
+            {isSidebarExpanded ? (
+              <ChevronLeftIcon className="h-6 w-6" />
+            ) : (
+              <ChevronRightIcon className="h-6 w-6" />
+            )}
+          </button>
+          {isSidebarExpanded && (
+            <button
+              type="button"
+              onClick={toggleAllItems}
+              className="p-2 rounded-lg hover:bg-gray-800 text-white bg-transparent border-none focus:outline-none"
+              title={isAllExpanded ? "Collapse All" : "Expand All"}
+            >
+              <ArrowsUpDownIcon className="h-6 w-6" />
+            </button>
           )}
-        </button>
+        </div>
       </div>
 
-      <nav className="mt-4">
+      <nav 
+        ref={sidebarRef}
+        className="mt-4 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+      >
         {menuItems.map((item) => (
           <div key={item.id} className="bg-black">
             <button
@@ -161,6 +209,7 @@ const Sidebar = ({ onMenuItemSelect }) => {
                       e.preventDefault();
                       handleMenuItemClick(subItem);
                     }}
+                    ref={selectedItemRef}
                     className="block px-4 py-2 text-lg font-bold text-white hover:bg-gray-800 hover:text-green-400 rounded-lg"
                   >
                     {subItem.title}

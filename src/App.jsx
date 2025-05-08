@@ -11,12 +11,19 @@ import ProgressNotes from './components/dashboard/ProgressNotes'
 import AppointmentManagement from './components/dashboard/AppointmentManagement'
 import AppointmentHistory from './components/dashboard/AppointmentHistory'
 import ProviderSchedule from './components/dashboard/ProviderSchedule'
+import SecureMessaging from './components/dashboard/SecureMessaging'
+import DocumentManagement from './components/dashboard/DocumentManagement'
+import { registerLicense } from "@syncfusion/ej2-base";
 import './App.css'
 
 function App() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
+
+  registerLicense(
+			"ORg4AjUWIQA/Gnt2XFhhQlJHfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTH5WdkJhW39WdHZSQ2BUWkZ/",
+		);
 
   const handleLogin = (credentials) => {
     console.log('Login attempt:', credentials);
@@ -72,6 +79,50 @@ function App() {
         return <AppointmentHistory />;
       case '/dashboard/provider-schedule':
         return <ProviderSchedule />;
+
+      // Secure Messaging
+      case '/dashboard/messaging':
+        return <SecureMessaging showArchive={false} />;
+      case '/dashboard/message-archive':
+        return <SecureMessaging showArchive={true} />;
+
+      // Document & Form Management
+      case '/dashboard/documents':
+        return <DocumentManagement showSignatures={false} />;
+      case '/dashboard/signatures':
+        return <DocumentManagement showSignatures={true} />;
+      
+      // Billing & Payments
+      case '/dashboard/billing':
+        return (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Billing & Payments</h1>
+            <p className="text-gray-600">Billing and payment management coming soon.</p>
+          </div>
+        );
+      case '/dashboard/payments':
+        return (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Secure Payments</h1>
+            <p className="text-gray-600">Secure payment processing coming soon.</p>
+          </div>
+        );
+
+      // Telehealth Integration
+      case '/dashboard/telehealth':
+        return (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Telehealth</h1>
+            <p className="text-gray-600">Video visit integration coming soon.</p>
+          </div>
+        );
+      case '/dashboard/telehealth-settings':
+        return (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">HIPAA Settings</h1>
+            <p className="text-gray-600">Telehealth security settings coming soon.</p>
+          </div>
+        );
       
       default:
         return (
